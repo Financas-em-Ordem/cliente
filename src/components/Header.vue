@@ -1,45 +1,51 @@
 <template>
-    <el-header>
-        <el-row justify="center">
-            <el-col :span="22">
-                <div class="paginas">
-                    <span @click="router.push('/home')">Home</span>
-                    <span @click="router.push('/despesas')">Despesas</span>
-                    <span @click="router.push('/percentuais')">Total Gasto</span>
-                    <span>Despesas personalizadas</span>
-                    <span>Sobre nós</span>
-                </div>
-                <span>Sair</span>
-            </el-col>
-        </el-row>
-    </el-header>
+    <el-row justify="center">
+        <el-col :span="22">
+            <el-menu mode="horizontal">
+
+                    <el-menu-item @click="router.push('/home')">Home</el-menu-item>
+                    <el-menu-item @click="router.push('/despesas')">Despesas</el-menu-item>
+                    <el-menu-item @click="router.push('/percentuais')">Total Gasto</el-menu-item>
+                    <el-menu-item @click="router.push('/despesas-personalizadas')">Despesas personalizadas</el-menu-item>
+                    <el-menu-item @click="router.push('/sobre')">Sobre</el-menu-item>
+                    <div class="acoes">
+                        <el-menu-item v-if="isSessao()" @click="sair()">Sair</el-menu-item>
+                        <div v-else style="display: flex;">
+                            <el-menu-item @click="router.push('/login')">Login</el-menu-item>
+                            <el-menu-item @click="router.push('/cadastro')">Cadastro</el-menu-item>
+                        </div>
+                    </div>
+            </el-menu>
+        </el-col>
+    </el-row>
 </template>
 <script setup>
-import {useRouter} from 'vue-router'
+import { useRouter } from 'vue-router'
 
 const router = useRouter();
 
+const sair = () => {
+    localStorage.removeItem("token");
+
+    return router.push("/login")
+}
+
+const isSessao = () => {
+    return localStorage.getItem('token')
+}
 
 </script>
 <style scoped>
-.el-header {
+
+.el-menu{
+    border: none
+}
+.el-row{
     border-bottom: 1px solid var(--el-border-color-hover);
-    padding: 1rem 0;
-}
 
-.el-col {
+}
+.acoes{
     display: flex;
-    justify-content: space-between;
-}
-
-span {
-    margin: 0 10px;
-    cursor: pointer;
-}
-span:first-child{
-    margin-left: 0;
-}
-span:last-child {
-    margin-right: 0;
+    margin-left: auto;
 }
 </style>

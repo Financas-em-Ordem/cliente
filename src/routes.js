@@ -5,6 +5,9 @@ import Cadastro from './views/Cadastro.vue'
 import Despesas from './views/Despesas.vue'
 import Teste from './views/Teste.vue'
 import Percentuais from './views/Percentuais.vue'
+import DespesasPersonalizadas from './views/DespesasPersonalizadas.vue'
+import Sobre from './views/Sobre.vue'
+
 const routes = [
     {path: '/', component: Home, meta:{authAccess: true}, name: Home},
     { path: '/home', component: Home, meta: { authAccess: true }, name: Home },
@@ -12,7 +15,9 @@ const routes = [
     { path: '/login', component: Login, meta: { authAccess: false }, name: Login },
     { path: '/cadastro', component: Cadastro, meta: { authAccess: false }, name: Cadastro },
     { path: '/teste', component: Teste, meta: { authAccess: true }, name: Teste },
-    { path: '/despesas', component: Despesas, meta: {authAccess: true}, name: Despesas}
+    { path: '/despesas', component: Despesas, meta: {authAccess: true}, name: Despesas},
+    { path: '/despesas-personalizadas', component: DespesasPersonalizadas, meta: {authAccess: true}, name: DespesasPersonalizadas},
+    { path: '/sobre', component: Sobre,  name: Sobre}
 ];
 
 const router = createRouter({
@@ -22,7 +27,7 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
     //com flag de autenticaçao igual true e sem token de autenticaçao cai no login
-    if(to.meta.authAccess && !sessionStorage.getItem("token"))
+    if(to.meta.authAccess && !localStorage.getItem("token"))
         next({name: Login})
     //com flag de autenticaçao igual false so segue
     else if(!to.meta.authAccess)
