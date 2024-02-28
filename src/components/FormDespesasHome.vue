@@ -80,7 +80,7 @@ const salvar = (formDespesa) => {
             console.log(formatValor)
 
             await axios
-                .post("http://3.137.212.158:3000/despesa/salvar",
+                .post("https://financas-backend-one.vercel.app/despesa/salvar",
                     {
                         "descricao": formulario.value.descricao,
                         "data": formulario.value.data,
@@ -89,7 +89,7 @@ const salvar = (formDespesa) => {
                         "usuarioId": despesaStore.perfil.id
                     },
                     {
-                        headers: { 'Authorization': `Bearer ${sessionStorage.getItem("token")}` }
+                        headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
                     }
                 )
                 .then(response => {
@@ -109,4 +109,9 @@ const salvar = (formDespesa) => {
     .container{
         padding: 24px 0;
     }
+    @media (max-width: 576px){
+    h1{
+        font-size: 1.75rem;
+    }
+}
 </style>

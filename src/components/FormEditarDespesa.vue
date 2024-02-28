@@ -81,7 +81,7 @@ const salvar = (form) => {
                 console.log(formatData)
                 console.log(despesaStore.showDespesaEditada.data)
                 axios
-                    .patch(`http://3.137.212.158:3000/despesa/atualizar/`, {
+                    .patch(`https://financas-backend-one.vercel.app/despesa/atualizar/`, {
                         "id": despesaStore.showDespesaEditada.id,
                         "descricao": despesaStore.showDespesaEditada.descricao,
                         "data": formatData,
@@ -90,7 +90,7 @@ const salvar = (form) => {
                         "usuarioId": despesaStore.showPerfilId
                     }, {
                         headers: {
-                            'Authorization': `Bearer ${sessionStorage.getItem("token")}`
+                            'Authorization': `Bearer ${localStorage.getItem("token")}`
                         }
                     })
                     .then(response => {
