@@ -6,7 +6,7 @@
             <p>
                 O total gasto desse mês até agora é de R${{ calcTotalGasto() }}
             </p>
-            <el-collapse accordion>
+            <el-collapse v-model="idAccordion" accordion>
                 <el-collapse-item v-for="(despesa, i) in accordionDespesas" :name="despesa.tipoDespesa"
                     @click="carregarListaDespesasTipo(despesaStore.showPerfilId, despesaStore.showPrimeiroDiaMes, despesaStore.showUltimoDiaMes, 1, 5, despesa.tipoDespesa)">
                     <template #title>
@@ -15,15 +15,23 @@
                             <info-filled />
                         </el-icon>
                     </template>
+
                     <p>
                         Até o momento com as despesas de {{ despesa.nome }} foram gastos R${{ despesa.total_despesa }}.
                         O ideal é que seja gasto R${{ (tiposDespesa[i].percentual_salario / 100) * perfil.salario }}
                     </p>
-                    <el-table v-if="listaDespesas.length" :data="listaDespesas" style="width: fit-content">
+                    <el-table v-if="listaDespesas.length && getLargura" :data="listaDespesas" style="width: fit-content">
                         <el-table-column prop="data" label="Data" align="center" width=150 />
                         <el-table-column prop="descricao" label="Descriçao" align="center" width="200" />
                         <el-table-column prop="valor" label="Valor" align="center" />
                     </el-table>
+                    
+                    <div class="despesa-item" v-for="despesa in listaDespesas" v-else>
+                        <h5>{{ despesa.data }} </h5>
+                        <p> {{ despesa.descricao }} - R${{ despesa.valor }} </p>
+                    </div>
+
+                    <p>Para ver o resto das despesas desse tipo no mês vá nas despesas personalizadas</p>
                 </el-collapse-item>
 
             </el-collapse>
@@ -32,7 +40,7 @@
 </template>
 
 <script setup>
-import { onMounted, computed, ref } from 'vue';
+import { onMounted, computed, ref, onBeforeUnmount} from 'vue';
 import { usedespesaStore } from '../store/despesa';
 
 import { format } from 'date-fns'
@@ -44,8 +52,9 @@ const accordionDespesas = computed(() => despesaStore.gastos_tipos_despesa)
 const tiposDespesa = computed(() => despesaStore.showTiposDespesa);
 const perfil = computed(() => despesaStore.showPerfil)
 let listaDespesas = ref([])
-const pagina = ref(1);
 
+
+const idAccordion = ref('1')
 
 onMounted(async () => {
     despesaStore.getDiasMes();
@@ -55,19 +64,33 @@ onMounted(async () => {
     calcTotalGasto()
 })
 
+const handleChange = (tipoId) => {
+    console.log(tipoId);
+    console.log(idAccordion.value)
+    // return carregarListaDespesasTipo(despesaStore.showPerfilId, despesaStore.showPrimeiroDiaMes, despesaStore.showUltimoDiaMes, pagina.value, 2, tipoId)
+}
+
 const carregarListaDespesasTipo = async (perfilId, dataAtual, dataDiasAtras, pagina, itensPagina, tipoId) => {
+    console.log({
+        id: perfilId,
+        data1: dataAtual,
+        data2: dataDiasAtras,
+        pagina: pagina,
+        itensPagina: itensPagina,
+        tipo: tipoId
+    })
+    handleChange(tipoId)
     await axios
-        .post(`http://3.137.212.158:3000/despesa/listar-tipo/${perfilId}`, {
+        .post(`https://financas-backend-one.vercel.app/despesa/listar-tipo/${perfilId}`, {
             "tipoId": tipoId,
             "data_inicial": dataAtual,
             "data_final": dataDiasAtras,
             "pagina": pagina,
             "itens_pagina": itensPagina
         }, {
-            headers: { 'Authorization': `Bearer ${sessionStorage.getItem("token")}` }
+            headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
         })
         .then(response => {
-            console.log(response.data.despesas)
             listaDespesas.value = response.data.despesas;
 
             listaDespesas.value.map(despesa => {
@@ -79,9 +102,11 @@ const carregarListaDespesasTipo = async (perfilId, dataAtual, dataDiasAtras, pag
             return listaDespesas
         })
         .catch(() => {
-            alert("deu merda")
+            alert("erro ao realizar comando")
         })
 }
+
+
 const calcTotalGasto = () => {
     let totalGasto = 0;
 
@@ -93,4 +118,30 @@ const calcTotalGasto = () => {
 
     return totalGasto.toFixed(2)
 }
+
+const getLargura = ref(window.innerWidth >= 768)
+
+const handleResize = () => {
+    getLargura.value = window.innerWidth >= 768;
+};
+
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize);
+});
 </script>
+<style scoped>
+.despesa-item h5, .despesa-item h4, .despesa-item p{
+    margin: 0;
+    text-transform: capitalize;
+}
+
+.despesa-item{
+    border-bottom: 1px solid var(--el-border-color-hover);
+    margin-top: 12px;
+}
+</style>

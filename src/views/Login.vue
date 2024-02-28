@@ -1,22 +1,25 @@
 <template>
-    <el-form class="box-login" :model="form" ref="loginForm">
-        <el-form-item prop="email" :rules="emailRules">
-            <label for="email">Email</label>
-            <el-input type="text" v-model="form.email" placeholder="digite o email" />
-        </el-form-item>
+    <div class="box-login">
+        <el-form  :model="form" ref="loginForm">
+            <el-form-item prop="email" :rules="emailRules" style="display: grid;">
+                <label for="email">Email</label>
+                <el-input type="text" v-model="form.email" placeholder="digite o email" style="width: 100%;" />
+            </el-form-item>
 
-        <el-form-item prop="senha" :rules="passwordRules">
-            <label for="senha">Senha</label>
-            <el-input type="password" v-model="form.senha" placeholder="digite a senha" />
-        </el-form-item>
+            <el-form-item prop="senha" :rules="passwordRules" style="display: grid;">
+                <label for="senha">Senha</label>
+                <el-input type="password" v-model="form.senha" placeholder="digite a senha" style="width: 100%;" />
+            </el-form-item>
 
-        <el-button @click="login(loginForm)">Entrar</el-button>
-    </el-form>
+            <el-button @click="login(loginForm)">Entrar</el-button>
+        </el-form>
+        <span @click="router.push('/cadastro')">Não possui conta? Faça seu cadastro </span>
+    </div>
 </template>
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 
 const router = useRouter()
 
@@ -56,14 +59,14 @@ const login = (formLogin) => {
     formLogin.validate(async (valid) => {
         if (valid) {
             await axios
-                .post("http://3.137.212.158:3000/login", {
+                .post("https://financas-backend-one.vercel.app/login", {
                     "email": form.value.email,
                     "senha": form.value.senha
                 })
                 .then(response => {
                     alert("logado com sucesso")
-    
-                    sessionStorage.setItem("token", response.data.access_token)
+
+                    localStorage.setItem("token", response.data.access_token)
                     router.push('/home')
                 })
                 .catch(error => {
@@ -87,29 +90,35 @@ label {
     color: var(--preto);
 }
 
-.box-login {
-    width: 350px;
-    height: 200px;
-    border: 1px solid var(--el-border-color-hover);
-    border-radius: 4px;
-    padding: 1rem;
+.box-login{
     position: fixed;
     top: calc(50% - 125px);
     left: calc(50% - 175px);
-    place-items: center;
-    display: grid;
-
+}
+.box-login .el-form{
+    width: 300px;
+    height: 200px;
+    border: 1px solid var(--el-border-color-hover);
+    border-radius: 4px;
+    padding: 1.5rem;
 }
 
-.form-field {
-    width: 100%;
+.box-login .el-button {
+    display: flex;
+    margin: auto;
 }
 
-.el-form-item {
+.box-login .el-form-item {
     flex-direction: column;
 }
 
-.el-form-item__label label {
+.box-login .el-form-item__label label {
     display: none;
+}
+
+.box-login span{
+    float: right;
+    font-size: 13.5px;
+    cursor: pointer;
 }
 </style>
