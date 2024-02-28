@@ -1,6 +1,6 @@
 <template>
     <div class="box-login">
-        <el-form  :model="form" ref="loginForm">
+        <el-form :model="form" ref="loginForm">
             <el-form-item prop="email" :rules="emailRules" style="display: grid;">
                 <label for="email">Email</label>
                 <el-input type="text" v-model="form.email" placeholder="digite o email" style="width: 100%;" />
@@ -62,7 +62,12 @@ const login = (formLogin) => {
                 .post("https://financas-backend-one.vercel.app/login", {
                     "email": form.value.email,
                     "senha": form.value.senha
-                })
+                }, {
+                    headers: {
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                }
+                )
                 .then(response => {
                     alert("logado com sucesso")
 
@@ -90,12 +95,13 @@ label {
     color: var(--preto);
 }
 
-.box-login{
+.box-login {
     position: fixed;
     top: calc(50% - 125px);
     left: calc(50% - 175px);
 }
-.box-login .el-form{
+
+.box-login .el-form {
     width: 300px;
     height: 200px;
     border: 1px solid var(--el-border-color-hover);
@@ -116,7 +122,7 @@ label {
     display: none;
 }
 
-.box-login span{
+.box-login span {
     float: right;
     font-size: 13.5px;
     cursor: pointer;
