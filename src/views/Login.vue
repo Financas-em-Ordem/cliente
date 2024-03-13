@@ -59,13 +59,9 @@ const login = (formLogin) => {
     formLogin.validate(async (valid) => {
         if (valid) {
             await axios
-                .post("https://financas-backend-one.vercel.app/login", {
+                .post("https://backend-production-4d2f.up.railway.app/login", {
                     "email": form.value.email,
                     "senha": form.value.senha
-                }, {
-                    headers: {
-                        'Access-Control-Allow-Origin': '*'
-                    }
                 }
                 )
                 .then(response => {

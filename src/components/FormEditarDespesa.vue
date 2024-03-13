@@ -81,7 +81,7 @@ const salvar = (form) => {
                 console.log(formatData)
                 console.log(despesaStore.showDespesaEditada.data)
                 axios
-                    .patch(`https://financas-backend-one.vercel.app/despesa/atualizar/`, {
+                    .patch(`https://backend-production-4d2f.up.railway.app/despesa/atualizar/`, {
                         "id": despesaStore.showDespesaEditada.id,
                         "descricao": despesaStore.showDespesaEditada.descricao,
                         "data": formatData,
