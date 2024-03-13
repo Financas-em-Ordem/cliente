@@ -81,7 +81,7 @@ const carregarListaDespesasTipo = async (perfilId, dataAtual, dataDiasAtras, pag
     })
     handleChange(tipoId)
     await axios
-        .post(`https://financas-backend-one.vercel.app/despesa/listar-tipo/${perfilId}`, {
+        .post(`https://backend-production-4d2f.up.railway.app/despesa/listar-tipo/${perfilId}`, {
             "tipoId": tipoId,
             "data_inicial": dataAtual,
             "data_final": dataDiasAtras,

@@ -80,7 +80,7 @@ const salvar = (formDespesa) => {
             console.log(formatValor)
 
             await axios
-                .post("https://financas-backend-one.vercel.app/despesa/salvar",
+                .post("https://backend-production-4d2f.up.railway.app/despesa/salvar",
                     {
                         "descricao": formulario.value.descricao,
                         "data": formulario.value.data,
