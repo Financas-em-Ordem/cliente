@@ -26,14 +26,13 @@ export const usedespesaStore = defineStore("home", {
         itensProximaPaginaPersonalizada: true,
         editandoDespesa: false
     }),
-    actions: {
+    actions: {  
         async getPerfil() {
             await axios
                 .get("https://backend-production-4d2f.up.railway.app/usuario/me", {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("token")}`,
                         'Access-Control-Allow-Origin': '*'
-
                     }
                 })
                 .then(response => {
@@ -66,7 +65,6 @@ export const usedespesaStore = defineStore("home", {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("token")}`,
                         'Access-Control-Allow-Origin': '*'
-
                     }
                 })
                 .then(response => {
@@ -116,7 +114,6 @@ export const usedespesaStore = defineStore("home", {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("token")}`,
                         'Access-Control-Allow-Origin': '*'
-
                     }
                 })
                 .then(response => {

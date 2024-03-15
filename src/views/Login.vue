@@ -28,31 +28,17 @@ const loginForm = ref(null)
 
 const emailRules = [
     { required: true, message: "Por favor digite o email", trigger: "blur" },
-    /*{
+    {
         type: "email",
         message: "Por favor digite um email válido",
         trigger: "blur",
     },
-    */
+    
 ];
 
 const passwordRules = [
     { required: true, message: "Por favor digite a senha", trigger: "blur" },
-    /*{
-        validator: (rule, value, callback) => {
-            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&]).{6,}$/;
-            if (!regex.test(value)) {
-                callback(
-                    new Error(
-                        "A senha deve ter ao menos 6 caracteres, uma letra maiúscula, uma letra minúscula e um caracter especial"
-                    )
-                );
-            } else {
-                callback();
-            }
-        },
-        trigger: "blur",
-    },*/
+
 ];
 
 const login = (formLogin) => {
@@ -70,9 +56,8 @@ const login = (formLogin) => {
                     localStorage.setItem("token", response.data.access_token)
                     router.push('/home')
                 })
-                .catch(error => {
-                    alert("erro ao logar")
-                    console.log(error)
+                .catch(erro => {
+                    alert(erro.response.data.error)
                 })
         }
     })

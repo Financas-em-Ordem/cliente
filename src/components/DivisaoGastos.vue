@@ -67,7 +67,6 @@ onMounted(async () => {
 const handleChange = (tipoId) => {
     console.log(tipoId);
     console.log(idAccordion.value)
-    // return carregarListaDespesasTipo(despesaStore.showPerfilId, despesaStore.showPrimeiroDiaMes, despesaStore.showUltimoDiaMes, pagina.value, 2, tipoId)
 }
 
 const carregarListaDespesasTipo = async (perfilId, dataAtual, dataDiasAtras, pagina, itensPagina, tipoId) => {
