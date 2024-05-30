@@ -149,7 +149,7 @@ const cadastrar = (formCadastro) => {
     formCadastro.validate(async (valid) => {
         if (valid) {
             await axios
-                .post("https://backend-production-4d2f.up.railway.app/usuario", {
+                .post("https://fincancas-ordem-api.onrender.com/usuario", {
                     "email": form.value.email,
                     "nome_completo": form.value.nome_completo,
                     "data_nascimento": form.value.data_nascimento,
