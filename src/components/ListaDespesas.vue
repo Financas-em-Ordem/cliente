@@ -72,7 +72,7 @@ const handleAvancarPagina = () => {
 
 const excluirDespesa = async (id) => {
     await axios
-        .delete(`https://backend-production-4d2f.up.railway.app/despesa/deletar/${id}`, {
+        .delete(`https://fincancas-ordem-api.onrender.com/despesa/deletar/${id}`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
         })
         .then(response => {

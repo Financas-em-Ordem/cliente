@@ -29,7 +29,7 @@ export const usedespesaStore = defineStore("home", {
     actions: {  
         async getPerfil() {
             await axios
-                .get("https://backend-production-4d2f.up.railway.app/usuario/me", {
+                .get("https://fincancas-ordem-api.onrender.com/usuario/me", {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("token")}`,
                         'Access-Control-Allow-Origin': '*'
@@ -44,7 +44,7 @@ export const usedespesaStore = defineStore("home", {
         },
         async getTiposDespesa() {
             await axios
-                .get("https://backend-production-4d2f.up.railway.app/tipo_despesa/listar", {
+                .get("https://fincancas-ordem-api.onrender.com/tipo_despesa/listar", {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("token")}`,
                         'Access-Control-Allow-Origin': '*'
@@ -61,7 +61,7 @@ export const usedespesaStore = defineStore("home", {
         },
         async listarDespesasPerfil(id) {
             await axios
-                .get(`https://backend-production-4d2f.up.railway.app/despesa/usuario/${id}`, {
+                .get(`https://fincancas-ordem-api.onrender.com/despesa/usuario/${id}`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("token")}`,
                         'Access-Control-Allow-Origin': '*'
@@ -82,7 +82,7 @@ export const usedespesaStore = defineStore("home", {
         },
         async listarDespesasHome(id) {
             await axios
-                .get(`https://backend-production-4d2f.up.railway.app/despesa/listar-dez-ultimas/${id}`, {
+                .get(`https://fincancas-ordem-api.onrender.com/despesa/listar-dez-ultimas/${id}`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("token")}`,
                         'Access-Control-Allow-Origin': '*'
@@ -105,7 +105,7 @@ export const usedespesaStore = defineStore("home", {
         },
         async listarDespesasPorPeriodo(usuarioId, pagina, itensPagina) {
             await axios
-                .post(`https://backend-production-4d2f.up.railway.app/despesa/listar-periodo/${usuarioId}`, {
+                .post(`https://fincancas-ordem-api.onrender.com/despesa/listar-periodo/${usuarioId}`, {
                     "data_inicial": this.primeiro_dia_mes,
                     "data_final": this.ultimo_dia_mes,
                     "pagina": pagina,
@@ -166,7 +166,7 @@ export const usedespesaStore = defineStore("home", {
         },
         async getPercentualPorTipo(usuarioId, dataInicial, dataFinal) {
             await axios
-                .post(`https://backend-production-4d2f.up.railway.app/despesa/despesas-tipo/${usuarioId}`, {
+                .post(`https://fincancas-ordem-api.onrender.com/despesa/despesas-tipo/${usuarioId}`, {
                     "data_inicial": dataInicial,
                     "data_final": dataFinal,
                 }, {
@@ -194,7 +194,7 @@ export const usedespesaStore = defineStore("home", {
         async listarDespesasPersonalizada(usuarioId, dataInicial, dataFinal, tiposId, itensPagina, pagina) {
 
             await axios
-                .post(`https://backend-production-4d2f.up.railway.app/despesa/listagem-personalizada/${usuarioId}`, {
+                .post(`https://fincancas-ordem-api.onrender.com/despesa/listagem-personalizada/${usuarioId}`, {
                     "data_inicial": dataInicial,
                     "data_final": dataFinal,
                     "tiposId": tiposId,
