@@ -21,7 +21,6 @@ const routes = [
 ];
 
 const router = createRouter({
-    base: 'https://clientee.onrender.com/',
     history: createWebHistory(),
     routes
 });
