@@ -4,14 +4,14 @@
             <h1>Despesas do mês de {{ despesaStore.showMesAtual }} </h1>
 
             <p>
-                O total gasto desse mês até agora é de R${{ calcTotalGasto() }}
+                O total gasto desse mês até agora é de R${{ calcTotalGasto()}}
             </p>
-            <el-collapse v-model="idAccordion" accordion>
+            <el-collapse v-model="idAccordion" v-show="accordionDespesas" accordion>
                 <el-collapse-item v-for="(despesa, i) in accordionDespesas" :name="despesa.tipoDespesa"
                     @click="carregarListaDespesasTipo(despesaStore.showPerfilId, despesaStore.showPrimeiroDiaMes, despesaStore.showUltimoDiaMes, 1, 5, despesa.tipoDespesa)">
                     <template #title>
                         {{ despesa.nome }} (%{{ ((despesa.total_despesa / perfil.salario) * 100).toFixed(2) }} - %{{
-                            tiposDespesa[i].percentual_salario }})<el-icon class="header-icon">
+            tiposDespesa[i].percentual_salario }})<el-icon class="header-icon">
                             <info-filled />
                         </el-icon>
                     </template>
@@ -20,12 +20,13 @@
                         Até o momento com as despesas de {{ despesa.nome }} foram gastos R${{ despesa.total_despesa }}.
                         O ideal é que seja gasto R${{ (tiposDespesa[i].percentual_salario / 100) * perfil.salario }}
                     </p>
-                    <el-table v-if="listaDespesas.length && getLargura" :data="listaDespesas" style="width: fit-content">
+                    <el-table v-if="listaDespesas.length && getLargura" :data="listaDespesas"
+                        style="width: fit-content">
                         <el-table-column prop="data" label="Data" align="center" width=150 />
                         <el-table-column prop="descricao" label="Descriçao" align="center" width="200" />
                         <el-table-column prop="valor" label="Valor" align="center" />
                     </el-table>
-                    
+
                     <div class="despesa-item" v-for="despesa in listaDespesas" v-else>
                         <h5>{{ despesa.data }} </h5>
                         <p> {{ despesa.descricao }} - R${{ despesa.valor }} </p>
@@ -40,7 +41,7 @@
 </template>
 
 <script setup>
-import { onMounted, computed, ref, onBeforeUnmount} from 'vue';
+import { onMounted, computed, ref, onBeforeUnmount } from 'vue';
 import { usedespesaStore } from '../store/despesa';
 
 import { format } from 'date-fns'
@@ -60,36 +61,20 @@ onMounted(async () => {
     despesaStore.getDiasMes();
     await despesaStore.getPerfil();
     await despesaStore.getTiposDespesa();
-    await despesaStore.getPercentualPorTipo(despesaStore.showPerfilId, despesaStore.showPrimeiroDiaMes, despesaStore.showUltimoDiaMes);
+    await despesaStore.getPercentualPorTipo(despesaStore.showPrimeiroDiaMes, despesaStore.showUltimoDiaMes);
     calcTotalGasto()
 })
 
-const handleChange = (tipoId) => {
-    console.log(tipoId);
-    console.log(idAccordion.value)
-    // return carregarListaDespesasTipo(despesaStore.showPerfilId, despesaStore.showPrimeiroDiaMes, despesaStore.showUltimoDiaMes, pagina.value, 2, tipoId)
-}
-
 const carregarListaDespesasTipo = async (perfilId, dataAtual, dataDiasAtras, pagina, itensPagina, tipoId) => {
-    console.log({
-        id: perfilId,
-        data1: dataAtual,
-        data2: dataDiasAtras,
-        pagina: pagina,
-        itensPagina: itensPagina,
-        tipo: tipoId
+    await axios.post(`${import.meta.env.VITE_API_URL}/despesa/listar-tipo/${perfilId}`, {
+        "tipoId": tipoId,
+        "data_inicial": dataAtual,
+        "data_final": dataDiasAtras,
+        "pagina": pagina,
+        "itens_pagina": itensPagina
+    }, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
     })
-    handleChange(tipoId)
-    await axios
-        .post(`${process.env.api}/despesa/listar-tipo/${perfilId}`, {
-            "tipoId": tipoId,
-            "data_inicial": dataAtual,
-            "data_final": dataDiasAtras,
-            "pagina": pagina,
-            "itens_pagina": itensPagina
-        }, {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
-        })
         .then(response => {
             listaDespesas.value = response.data.despesas;
 
@@ -127,20 +112,22 @@ const handleResize = () => {
 
 
 onMounted(() => {
-  window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', handleResize);
+    window.removeEventListener('resize', handleResize);
 });
 </script>
 <style scoped>
-.despesa-item h5, .despesa-item h4, .despesa-item p{
+.despesa-item h5,
+.despesa-item h4,
+.despesa-item p {
     margin: 0;
     text-transform: capitalize;
 }
 
-.despesa-item{
+.despesa-item {
     border-bottom: 1px solid var(--el-border-color-hover);
     margin-top: 12px;
 }

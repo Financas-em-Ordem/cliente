@@ -163,7 +163,6 @@ const cadastrar = (formCadastro) => {
                 })
                 .catch(error => {
                     alert("cadastro deu erro. tente novamente");
-                    console.log(error)
                 })
         }
     })

@@ -1,23 +1,29 @@
 <template>
     <Header></Header>
-    <FormDespesasPersonalizadas @parametroConsulta="showParametroConsulta" :pagina="indexPagina"/>
-    <ListaDespesasPersonalizadas @pagina="showPagina" :parametro="parametroConsulta"/>
+    <FormDespesasPersonalizadas @searchForm="showFormSeacrh" />
+    <ListaDespesasPersonalizadas @pagina="showPagina" />
 </template>
 <script setup>
-import {ref} from 'vue'
+import { ref } from 'vue'
+import { usedespesaStore } from '../store/despesa';
 
 import Header from '../components/Header.vue';
 import FormDespesasPersonalizadas from '../components/FormDespesasPersonalizadas.vue';
 import ListaDespesasPersonalizadas from '../components/ListaDespesasPersonalizadas.vue';
 
 const parametroConsulta = ref({});
-const indexPagina = ref(0)
 
- const showParametroConsulta = (parametro) => {
-     parametroConsulta.value = parametro
- }
+const despesaStore = usedespesaStore();
 
-const showPagina = (pagina) =>{
-    indexPagina.value = pagina
+const showFormSeacrh = (parametro) => {
+    console.log(parametro)
+    parametroConsulta.value = { ...parametro, pagina: 1 }
+    despesaStore.listarDespesasPersonalizada(parametroConsulta.value)
 }
+
+const showPagina = (pagina) => {
+    parametroConsulta.value = { ...parametroConsulta.value, pagina: pagina }
+    despesaStore.listarDespesasPersonalizada(parametroConsulta.value)
+}
+
 </script>

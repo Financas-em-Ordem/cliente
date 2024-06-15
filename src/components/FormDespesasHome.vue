@@ -77,10 +77,8 @@ const salvar = (formDespesa) => {
     formDespesa.validate(async (valid) => {
         if (valid) {
             const formatValor = parseFloat(formulario.value.valor)
-            console.log(formatValor)
-
             await axios
-                .post("https://fincancas-ordem-api.onrender.com/despesa/salvar",
+                .post(`${ import.meta.env.VITE_API_URL}/despesa/salvar`,
                     {
                         "descricao": formulario.value.descricao,
                         "data": formulario.value.data,
@@ -94,12 +92,10 @@ const salvar = (formDespesa) => {
                 )
                 .then(response => {
                     alert("salvo com sucesso");
-                    console.log(response.data);
                     window.location.reload();
                 })
                 .catch(error => {
                     alert("deu erro")
-                    console.log(error)
                 })
         }
     })

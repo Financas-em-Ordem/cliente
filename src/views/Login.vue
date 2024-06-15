@@ -59,7 +59,7 @@ const login = (formLogin) => {
     formLogin.validate(async (valid) => {
         if (valid) {
             await axios
-                .post("https://fincancas-ordem-api.onrender.com/login", {
+                .post(`${ import.meta.env.VITE_API_URL}/login`,{
                     "email": form.value.email,
                     "senha": form.value.senha
                 }
@@ -72,7 +72,6 @@ const login = (formLogin) => {
                 })
                 .catch(error => {
                     alert("erro ao logar")
-                    console.log(error)
                 })
         }
     })
