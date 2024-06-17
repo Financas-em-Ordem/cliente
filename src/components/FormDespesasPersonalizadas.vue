@@ -8,18 +8,19 @@
 .container {
     padding: 24px 0;
 }
-.el-date-range-picker__content{}
 </style>
 <template>
     <el-row justify='center' class="container">
         <el-col :span="22">
             <h1>Consulta personalizada</h1>
-            <p>Selecione duas datas, tipo de despesas e a quantidade de itens por página para ver o que foi gasto no periodo determinado</p>
+            <p>Selecione duas datas, tipo de despesas e a quantidade de itens por página para ver o que foi gasto no
+                periodo determinado</p>
             <el-form :model="formulario" ref="consultaForm">
                 <el-form-item prop="datas" :rules="dataRules" style="display: grid;">
                     <label for="datas">Periodo das despesas</label>
                     <el-date-picker v-model="formulario.datas" type="daterange" start-placeholder="Data inicial"
-                        end-placeholder="Data Final" format="DD/MM/YYYY" value-format="YYYY-MM-DD" style="width: 100%;" />
+                        end-placeholder="Data Final" format="DD/MM/YYYY" value-format="YYYY-MM-DD"
+                        style="width: 100%;" />
                 </el-form-item>
 
                 <el-form-item prop="itens_paginacao" :rules="itensPagicanaoRules" style="display: grid;">
@@ -60,7 +61,7 @@ onMounted(async () => {
 const formulario = ref({})
 const consultaForm = ref({})
 
-const emit = defineEmits("parametroConsulta")
+const emit = defineEmits("searchForm")
 
 
 
@@ -69,45 +70,21 @@ const dataRules = { required: true, message: "Por favor preencha a data", trigge
 const tipoRules = {
     validator: (rule, value, callback) => {
         if (!formulario.value.checkbox.length)
-        callback(new Error("Por favor preencha o valor corretamente"));
-    else
-    callback()
-}
+            callback(new Error("Por favor preencha o valor corretamente"));
+        else
+            callback()
+    }
 }
 
 const itensPagicanaoRules = { required: true, message: "Por favor preencha a quantidade de itens por página", trigger: "blur" };
 
 const consultar = (form) => {
-    form.validate(async (valid) => {
-        if (valid) {
-            const listaTipos = [];
 
-            formulario.value.checkbox.forEach(tipo => {
-                listaTipos.push(tipo.id)
-            });
+    form.validate((valid) => {
+        if (valid) return emit("searchForm", { ...formulario.value })
 
-            despesaStore.listarDespesasPersonalizada(
-                despesaStore.showPerfilId, 
-                formulario.value.datas[0], 
-                formulario.value.datas[1], 
-                listaTipos, 
-                formulario.value.itens_paginacao,
-                1)
+        return alert("nao salvou pq deu erro")
+    });
 
-                emit("parametroConsulta", {
-                    perfilId: despesaStore.showPerfilId,
-                    data_inicial: formulario.value.datas[0],
-                    data_final: formulario.value.datas[1],
-                    tiposId: listaTipos,
-                    itens_pagina: formulario.value.itens_paginacao,
-                })
-
-
-        } else {
-            alert("nao salvou pq deu erro")
-        }
-    })
 }
-
-
 </script>

@@ -78,10 +78,8 @@ const salvar = (form) => {
                 let formatData = despesaStore.showDespesaEditada.data.split("/");
                 formatData = `${formatData[2]}-${formatData[1]}-${formatData[0]}`
 
-                console.log(formatData)
-                console.log(despesaStore.showDespesaEditada.data)
                 axios
-                    .patch(`https://fincancas-ordem-api.onrender.com/despesa/atualizar/`, {
+                    .patch(`${ import.meta.env.VITE_API_URL}/despesa/atualizar/`, {
                         "id": despesaStore.showDespesaEditada.id,
                         "descricao": despesaStore.showDespesaEditada.descricao,
                         "data": formatData,

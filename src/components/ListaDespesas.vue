@@ -5,13 +5,17 @@
             <el-table :data="listaDespesas" row-key="id" border default-expand-all v-if="getLargura">
                 <el-table-column prop="data" label="Data" align="center" sortable />
                 <el-table-column prop="descricao" label="Descriçao" class="coluna-descricao" align="center" sortable />
-                <el-table-column prop="tipoDespesa.nome" label="Tipo" class="coluna-descricao" align="center" sortable />
+                <el-table-column prop="tipoDespesa.nome" label="Tipo" class="coluna-descricao" align="center"
+                    sortable />
                 <el-table-column prop="valor" label="Valor(R$)" align="center" sortable />
                 <el-table-column prop="percentual" label="Percentual(%)" align="center" sortable />
                 <el-table-column align="center" label="Ações">
                     <template #default="scope">
-                        <el-button size="small" @click="handleOpenEdicao(scope.row)">Editar</el-button>
-                        <el-button size="small" type="danger" @click="excluirDespesa(scope.row.id)">Deletar</el-button>
+                        <div class="despesa-buttons">
+                            <el-button size="small" @click="handleOpenEdicao(scope.row)">Editar</el-button>
+                            <el-button size="small" type="danger"
+                                @click="excluirDespesa(scope.row.id)">Deletar</el-button>
+                        </div>
                     </template>
                 </el-table-column>
             </el-table>
@@ -72,12 +76,11 @@ const handleAvancarPagina = () => {
 
 const excluirDespesa = async (id) => {
     await axios
-        .delete(`https://fincancas-ordem-api.onrender.com/despesa/deletar/${id}`, {
+        .delete(`${import.meta.env.VITE_API_URL}/despesa/deletar/${id}`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
         })
         .then(response => {
             alert("despesa excluida")
-            console.log(response.data)
             window.location.reload()
         })
         .catch(error => {
@@ -140,20 +143,29 @@ p {
     justify-content: space-between;
 }
 
-.despesa-item .acoes{
+.despesa-item .acoes {
     display: grid;
     place-items: center;
 }
-.el-button+.el-button{
+
+.el-button+.el-button {
     margin: 0;
 }
-.despesa-item .acoes .el-button{
+
+.despesa-item .acoes .el-button {
     width: 3rem;
 }
+
 .box-paginacao {
     width: fit-content;
     margin: auto;
     margin-top: 8px;
+}
+
+.cell .despesa-buttons {
+    justify-content: center;
+    display: flex;
+    gap: 12px;
 }
 
 @media (max-width: 576px) {

@@ -29,9 +29,6 @@ const datas = (data) => {
     const inicioMes = startOfMonth(addMonths(data, 1));
     const finalMes = endOfMonth(addMonths(data, 1));
 
-    console.log(fomartarData(inicioMes))
-    console.log(fomartarData(finalMes))
 }
 
-console.log(teste())
 </script>

@@ -23,13 +23,13 @@ export const usedespesaStore = defineStore("home", {
         pagina: 1,
         totalGasto: 0,
         itensProxPagina: true,
-        itensProximaPaginaPersonalizada: true,
+        proxPagePersonalizada: false,
         editandoDespesa: false
     }),
     actions: {  
         async getPerfil() {
             await axios
-                .get("https://fincancas-ordem-api.onrender.com/usuario/me", {
+                .get(`${import.meta.env.VITE_API_URL}/usuario/me`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("token")}`,
                         'Access-Control-Allow-Origin': '*'
@@ -38,13 +38,13 @@ export const usedespesaStore = defineStore("home", {
                 .then(response => {
                     this.perfil = response.data
                 })
-                .catch(()=>{
+                .catch(() => {
                     alert("erro ao carregar usuario")
                 })
         },
         async getTiposDespesa() {
             await axios
-                .get("https://fincancas-ordem-api.onrender.com/tipo_despesa/listar", {
+                .get(`${import.meta.env.VITE_API_URL}/tipo_despesa/listar`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("token")}`,
                         'Access-Control-Allow-Origin': '*'
@@ -55,13 +55,13 @@ export const usedespesaStore = defineStore("home", {
                     this.tipos_despesas = response.data;
 
                 })
-                .catch(()=> {
+                .catch(() => {
                     alert("erro ao carregar tipos de despesa")
                 })
         },
         async listarDespesasPerfil(id) {
             await axios
-                .get(`https://fincancas-ordem-api.onrender.com/despesa/usuario/${id}`, {
+                .get(`${import.meta.env.VITE_API_URL}/despesa/usuario/${id}`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("token")}`,
                         'Access-Control-Allow-Origin': '*'
@@ -82,11 +82,9 @@ export const usedespesaStore = defineStore("home", {
         },
         async listarDespesasHome(id) {
             await axios
-                .get(`https://fincancas-ordem-api.onrender.com/despesa/listar-dez-ultimas/${id}`, {
+                .get(`${import.meta.env.VITE_API_URL}/despesa/listar-dez-ultimas/${id}`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("token")}`,
-                        'Access-Control-Allow-Origin': '*'
-
                     }
                 })
                 .then(response => {
@@ -105,7 +103,7 @@ export const usedespesaStore = defineStore("home", {
         },
         async listarDespesasPorPeriodo(usuarioId, pagina, itensPagina) {
             await axios
-                .post(`https://fincancas-ordem-api.onrender.com/despesa/listar-periodo/${usuarioId}`, {
+                .post(`${import.meta.env.VITE_API_URL}/despesa/listar-periodo/${usuarioId}`, {
                     "data_inicial": this.primeiro_dia_mes,
                     "data_final": this.ultimo_dia_mes,
                     "pagina": pagina,
@@ -162,11 +160,10 @@ export const usedespesaStore = defineStore("home", {
         despesaEdicao(despesa) {
             this.despesa_edicao = despesa;
             this.despesa_editada = JSON.parse(JSON.stringify(this.despesa_edicao))
-            console.log(this.despesa_editada)
         },
-        async getPercentualPorTipo(usuarioId, dataInicial, dataFinal) {
+        async getPercentualPorTipo(dataInicial, dataFinal) {
             await axios
-                .post(`https://fincancas-ordem-api.onrender.com/despesa/despesas-tipo/${usuarioId}`, {
+                .post(`${import.meta.env.VITE_API_URL}/despesa/despesas-tipo/${this.perfil.id}`, {
                     "data_inicial": dataInicial,
                     "data_final": dataFinal,
                 }, {
@@ -191,40 +188,31 @@ export const usedespesaStore = defineStore("home", {
                     alert("erro ao realizar comando")
                 })
         },
-        async listarDespesasPersonalizada(usuarioId, dataInicial, dataFinal, tiposId, itensPagina, pagina) {
-
+        async listarDespesasPersonalizada(form) {
             await axios
-                .post(`https://fincancas-ordem-api.onrender.com/despesa/listagem-personalizada/${usuarioId}`, {
-                    "data_inicial": dataInicial,
-                    "data_final": dataFinal,
-                    "tiposId": tiposId,
-                    "itens_pagina": itensPagina,
-                    "pagina": pagina
+                .post(`${import.meta.env.VITE_API_URL}/despesa/listagem-personalizada/${this.perfil.id}`, {
+                    "data_inicial": form.datas[0],
+                    "data_final": form.datas[1],
+                    "tiposId": form.checkbox.map(item => item.id),
+                    "itens_pagina": form.itens_paginacao,
+                    "pagina": form.pagina
                 }, {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
                 })
                 .then((response) => {
-                    console.log(response.data.despesas)
+                    if (!response.data.despesas.length) return alert("Nao há despesas com esses filtros. Tente novamente")
 
                     this.lista_despesas_personalizada = response.data.despesas
-                    this.itensProximaPaginaPersonalizada = response.data.itensProxPagina
+                    this.proxPagePersonalizada = response.data.itensProxPagina
 
                     this.lista_despesas_personalizada.map(despesa => {
-                            despesa.data = format(addDays(despesa.data, 1), 'dd/MM/yyyy');
+                        despesa.data = format(addDays(despesa.data, 1), 'dd/MM/yyyy');
 
-                            return despesa
+                        return despesa
                     })
-
-                    if (!response.data.despesas.length) {
-                        alert("Nao há despesas com esses filtros. Tente novamente")
-                    }
                 })
-                .catch(erro => {
-                    console.log(erro.data);
-
-                    alert("deu ruim")
-                })
-            }
+                .catch(() => alert("deu ruim"))
+        }
     },
     getters: {
         showPerfilId() { return this.perfil.id },
@@ -233,10 +221,10 @@ export const usedespesaStore = defineStore("home", {
         showPrimeiroDiaMes() { return this.primeiro_dia_mes },
         showUltimoDiaMes() { return this.ultimo_dia_mes },
         showListaDespesasPeriodo() { return this.lista_despesas_periodo },
-        showListaDespesasPersonalizada() {return this.lista_despesas_personalizada},
+        showListaDespesasPersonalizada() { return this.lista_despesas_personalizada },
         showIndicePagina() { return this.pagina },
         showItensProximaPagina() { return this.itensProxPagina },
-        showItensProximaPaginaPersonalizada() { return this.itensProximaPaginaPersonalizada },
+        showProxPagePersonalizada() { return this.proxPagePersonalizada },
         showListaDespesaHome() { return this.lista_despesas_home },
         showDespesaEdicao() { return this.despesa_edicao },
         showDespesaEditada() { return this.despesa_editada },
