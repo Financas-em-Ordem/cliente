@@ -26,14 +26,13 @@ export const usedespesaStore = defineStore("home", {
         proxPagePersonalizada: false,
         editandoDespesa: false
     }),
-    actions: {
+    actions: {  
         async getPerfil() {
             await axios
                 .get(`${import.meta.env.VITE_API_URL}/usuario/me`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("token")}`,
                         'Access-Control-Allow-Origin': '*'
-
                     }
                 })
                 .then(response => {
@@ -66,7 +65,6 @@ export const usedespesaStore = defineStore("home", {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("token")}`,
                         'Access-Control-Allow-Origin': '*'
-
                     }
                 })
                 .then(response => {
@@ -114,7 +112,6 @@ export const usedespesaStore = defineStore("home", {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("token")}`,
                         'Access-Control-Allow-Origin': '*'
-
                     }
                 })
                 .then(response => {
