@@ -32,30 +32,29 @@ p {
 
 .box-paginacao span {
     width: 52px;
+    justify-content: center;
+    display: flex
 }
 </style>
 <template>
     <el-row justify="center" class="container">
         <el-col :span="22">
-            <el-table row-key="id" :data="listaDespesas" border default-expand-all
-                v-if="listaDespesas.length >= 1 && getLargura">
+            <el-table row-key="id" :data="despesas" border default-expand-all v-if="despesas.length >= 1 && getLargura">
                 <el-table-column prop="data" label="Data" align="center" sortable />
                 <el-table-column prop="descricao" label="Descriçao" class="coluna-descricao" align="center" sortable />
                 <el-table-column prop="tipoDespesa.nome" label="Tipo" align="center" sortable />
                 <el-table-column prop="valor" label="Valor(R$)" align="center" sortable />
             </el-table>
-            <div class="despesa-item" v-for="despesa in listaDespesas" v-else>
+            <div class="despesa-item" v-for="despesa in despesas" v-else>
                 <h5>{{ despesa.data }} </h5>
                 <h4>{{ despesa.tipoDespesa.nome }}</h4>
                 <p> {{ despesa.descricao }} - R${{ despesa.valor }} </p>
             </div>
-            <div class="box-paginacao">
-                <span @click="voltarPagina()" v-if="indexPagina > 1" style="cursor: pointer;">Voltar</span>
+            <div class="box-paginacao" v-show="despesas.length >= 1">
+                <span @click="voltarPagina()" v-if="pagina > 1" style="cursor: pointer;">Voltar</span>
                 <span v-else></span>
-                {{ listaDespesas.length >= 1 ? indexPagina : "" }}
-                <span @click="passarPagina()"
-                    v-if="despesaStore.showProxPagePersonalizada"
-                    style="cursor: pointer;">Passar</span>
+                {{ pagina }}
+                <span @click="passarPagina()" v-if="proxPagina" style="cursor: pointer;">Passar</span>
                 <span v-else></span>
 
             </div>
@@ -63,22 +62,17 @@ p {
     </el-row>
 </template>
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import { usedespesaStore } from '../store/despesa';
-
-const despesaStore = usedespesaStore();
-
-const listaDespesas = computed(() => despesaStore.showListaDespesasPersonalizada)
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 
 const props = defineProps({
-    parametro: Object
+    despesas: Array,
+    proxPagina: Boolean,
+    pagina: Number,
 });
 
 let indexPagina = ref(1);
-const burlaUndefined = ref(0)
 
 const emit = defineEmits("pagina")
-
 
 const voltarPagina = () => {
     if (indexPagina.value <= 1) return
