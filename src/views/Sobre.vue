@@ -22,8 +22,13 @@
                 <li> <b>Educaçao:</b>  Gastos destinados para adiquirir conhecimento que impacte nos seus ganhos.  Corresponde a 10% do salário.</li>
             </ol>
             <p>
+<<<<<<< HEAD
+                As tecnologias utilizadas neste projeto na parte de frontend VueJS e no backend NestJS. Atualmente tanto a API quanto 
+                a parte visual do projeto estao hospedadas no Render.
+=======
                 As tecnologias utilizadas neste projeto na parte de frontend VueJS e no backend NestJS. Atualmente a API por enquanto está no Railway já
                 a parte visual do projeto está hospedada no Vercel.
+>>>>>>> f8ab7a1b74a69a4c34020be828cac51dbd8b557a
             </p>
             <p>Para análise mais técnica segue o link da organizaçao criado no <a href="https://github.com/orgs/Financas-em-Ordem/repositories" target="_blank">Github</a>  e seus respectivos repositorios</p>
             <p>Para ter acesso ao sistema <span @click="router.push('/cadastro')">Clique aqui</span> e crie ou acesse uma conta</p>
@@ -37,6 +42,7 @@
                 Minhas skills técnicas estão focadas na parte de frontend web mais especificamente <b>HTML, CSS, JavaScript e VueJS.</b> 
                 Na parte de backend minhas skills sao concentradas em maior parte <b>NestJS e Express</b> e menor parte <b>PHP e Java</b>
             </p>
+            <p>Tenho outro projeto online, o Barbearia247 é um sistema para agendamento de atendimento para Barbearias </p>
         </el-col>
     </el-row>
 </template>

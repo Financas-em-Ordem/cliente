@@ -1,8 +1,8 @@
 <template>
     <el-row justify="center" class="container">
         <el-col :span="22">
-            <h1>Suas despesas no mês de {{ despesaStore.showMesAtual }}</h1>
-            <el-table :data="listaDespesas" row-key="id" border default-expand-all v-if="getLargura">
+            <h1>Suas despesas no mês de {{ despesaStore.showMesAtual }} </h1>
+            <el-table :data="despesas" row-key="id" border default-expand-all v-if="getLargura">
                 <el-table-column prop="data" label="Data" align="center" sortable />
                 <el-table-column prop="descricao" label="Descriçao" class="coluna-descricao" align="center" sortable />
                 <el-table-column prop="tipoDespesa.nome" label="Tipo" class="coluna-descricao" align="center"
@@ -19,7 +19,7 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <div class="despesa-item" v-for="despesa in listaDespesas" v-else>
+            <div class="despesa-item" v-for="despesa in despesas" v-else>
                 <div>
                     <h5>{{ despesa.data }} </h5>
                     <h4>{{ despesa.tipoDespesa.nome }}</h4>
@@ -31,49 +31,71 @@
                 </div>
             </div>
             <div class="box-paginacao">
-                <span v-if="despesaStore.showIndicePagina > 1" @click="handleVoltarPagina()">Voltar</span>
-                <span> {{ despesaStore.showIndicePagina }}</span>
-                <span v-if="despesaStore.showItensProximaPagina" @click="handleAvancarPagina()">Avançar</span>
-            </div>
+                <span v-if="pagina > 1" @click="voltarPagina()" style="cursor: pointer;">Voltar</span>
+                <span v-else></span>
+
+                {{ pagina }}
+                <span v-if="proxPagina" @click="passarPagina()"  style="cursor: pointer;" >Avançar</span>
+                <span v-else></span>
+
+            </div>           
         </el-col>
 
     </el-row>
 </template>
 <script setup>
 import axios from 'axios';
+import { add, addDays, format, lastDayOfMonth, startOfMonth, getMonth } from 'date-fns';
 
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { usedespesaStore } from '../store/despesa';
 
-
 const despesaStore = usedespesaStore();
 
-const listaDespesas = computed(() => despesaStore.showListaDespesasPeriodo)
 onMounted(async () => {
-    await despesaStore.getPerfil()
-    await despesaStore.listarDespesasPerfil(despesaStore.showPerfilId)
     despesaStore.getDiasMes()
-    await despesaStore.listarDespesasPorPeriodo(despesaStore.showPerfilId, despesaStore.showIndicePagina, 10)
-})
+    await despesaStore.getPerfil()
+    await fetchDespesas()
+});
 
-const handleVoltarPagina = () => {
-    if (despesaStore.showIndicePagina <= 1)
-        return
+const despesas = ref([]);
+const proxPagina = ref(false);
 
-    despesaStore.voltarPagina()
-    return despesaStore.listarDespesasPorPeriodo(despesaStore.showPerfilId, despesaStore.showIndicePagina, 1)
+const pagina = ref(1)
+
+const fetchDespesas = async () => {
+    despesas.value = [];
+
+    await axios.post(`${import.meta.env.VITE_API_URL}/despesa/listar-periodo/${despesaStore.showPerfilId}`, {
+        "data_inicial": despesaStore.showPrimeiroDiaMes,
+        "data_final": despesaStore.showUltimoDiaMes,
+        "pagina": pagina.value,
+        "itens_pagina": 5
+    }, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
+    })
+        .then(response => {
+
+            despesas.value = response.data.despesas
+            proxPagina.value = response.data.itensProxPagina
+
+            despesas.value.map(despesa => {
+                const data = format(addDays(new Date(despesa.data), 1), 'dd/MM/yyyy');
+
+                const calcPercentual = (despesa.valor / despesaStore.showPerfil.salario) * 100;
+                const percentual = calcPercentual.toFixed(2);
+
+                despesa.data = data;
+                despesa.percentual = percentual;
+
+                return despesa
+            })
+
+        })
+        .catch(error => {
+            alert("erro ao carregar despesas")
+        })
 }
-
-const handleAvancarPagina = () => {
-
-    if (!despesaStore.showItensProximaPagina)
-        return
-
-    despesaStore.avancarPagina()
-
-    return despesaStore.listarDespesasPorPeriodo(despesaStore.showPerfilId, despesaStore.showIndicePagina, 1)
-}
-
 const excluirDespesa = async (id) => {
     await axios
         .delete(`${import.meta.env.VITE_API_URL}/despesa/deletar/${id}`, {
@@ -88,12 +110,30 @@ const excluirDespesa = async (id) => {
         })
 }
 
-const emits = defineEmits('despesaClicada');
+const voltarPagina  = async () =>{
+    if(pagina.value <= 1) return 
+    
+    pagina.value --;
+
+    await fetchDespesas();
+}
+
+const passarPagina = async () => {
+    if(proxPagina.value == false) return 
+
+    pagina.value ++;
+
+    await fetchDespesas();
+}
+
+const emit = defineEmits(["isEditando", "despesa"])
 
 const handleOpenEdicao = (despesa) => {
-    despesaStore.handleEditando();
+    emit("isEditando", true)
+    emit("despesa", despesa)
+    // despesaStore.handleEditando();
 
-    return despesaStore.despesaEdicao(despesa)
+    // return despesaStore.despesaEdicao(despesa)
 }
 
 const getLargura = ref(window.innerWidth >= 768)
@@ -116,9 +156,6 @@ h1 {
     margin-bottom: 2rem;
 }
 
-span {
-    cursor: pointer;
-}
 
 h5,
 h4,
@@ -166,6 +203,16 @@ p {
     justify-content: center;
     display: flex;
     gap: 12px;
+}
+.box-paginacao {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 1rem auto;
+}
+
+.box-paginacao span {
+    width: 52px;
 }
 
 @media (max-width: 576px) {

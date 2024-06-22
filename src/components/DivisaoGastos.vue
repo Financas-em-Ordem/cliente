@@ -4,21 +4,23 @@
             <h1>Despesas do mês de {{ despesaStore.showMesAtual }} </h1>
 
             <p>
-                O total gasto desse mês até agora é de R${{ calcTotalGasto()}}
+                O total gasto desse mês até agora é de R${{ calcTotalGasto() }}
             </p>
+
             <el-collapse v-model="idAccordion" v-show="accordionDespesas" accordion>
-                <el-collapse-item v-for="(despesa, i) in accordionDespesas" :name="despesa.tipoDespesa"
-                    @click="carregarListaDespesasTipo(despesaStore.showPerfilId, despesaStore.showPrimeiroDiaMes, despesaStore.showUltimoDiaMes, 1, 5, despesa.tipoDespesa)">
+                <el-collapse-item v-for="(despesa) in accordionDespesas" :name="despesa.tipoDespesa"
+                    @click="async () => { await carregarListaDespesasTipo(despesa.tipoDespesa) }">
                     <template #title>
-                        {{ despesa.nome }} (%{{ ((despesa.total_despesa / perfil.salario) * 100).toFixed(2) }} - %{{
-            tiposDespesa[i].percentual_salario }})<el-icon class="header-icon">
+                        {{ despesa.nome }} (%{{ calcPercentualTipo(despesa) }} -
+                        %{{ tiposDespesa[despesa.tipoDespesa].percentual_salario }})
+                        <el-icon class="header-icon">
                             <info-filled />
                         </el-icon>
                     </template>
 
                     <p>
                         Até o momento com as despesas de {{ despesa.nome }} foram gastos R${{ despesa.total_despesa }}.
-                        O ideal é que seja gasto R${{ (tiposDespesa[i].percentual_salario / 100) * perfil.salario }}
+                        O ideal é que seja gasto R${{ calcGastoIdeal(despesa) }}
                     </p>
                     <el-table v-if="listaDespesas.length && getLargura" :data="listaDespesas"
                         style="width: fit-content">
@@ -49,29 +51,57 @@ import axios from 'axios'
 
 const despesaStore = usedespesaStore();
 
-const accordionDespesas = computed(() => despesaStore.gastos_tipos_despesa)
+const accordionDespesas = ref([])
 const tiposDespesa = computed(() => despesaStore.showTiposDespesa);
 const perfil = computed(() => despesaStore.showPerfil)
-let listaDespesas = ref([])
-
 
 const idAccordion = ref('1')
+
+let listaDespesas = ref([])
 
 onMounted(async () => {
     despesaStore.getDiasMes();
     await despesaStore.getPerfil();
     await despesaStore.getTiposDespesa();
-    await despesaStore.getPercentualPorTipo(despesaStore.showPrimeiroDiaMes, despesaStore.showUltimoDiaMes);
+    await fetchAccordion();
     calcTotalGasto()
-})
+});
 
-const carregarListaDespesasTipo = async (perfilId, dataAtual, dataDiasAtras, pagina, itensPagina, tipoId) => {
-    await axios.post(`${import.meta.env.VITE_API_URL}/despesa/listar-tipo/${perfilId}`, {
+const fetchAccordion = async () => {
+    return await axios
+        .post(`${import.meta.env.VITE_API_URL}/despesa/despesas-tipo/${despesaStore.showPerfilId}`, {
+            "data_inicial": despesaStore.showPrimeiroDiaMes,
+            "data_final": despesaStore.showUltimoDiaMes,
+        }, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
+        })
+        .then(response => {
+            accordionDespesas.value = response.data
+
+            const tiposDespesasEdited = JSON.parse(JSON.stringify(despesaStore.showTiposDespesas))
+
+            accordionDespesas.value.map(tipo => {
+                tipo.nome = tiposDespesasEdited[tipo.tipoDespesa - 1].nome;
+
+                return tipo
+            })
+        })
+        .catch(erro => {
+            alert(JSON.stringify(erro.data))
+
+            alert("erro ao realizar comando")
+        })
+}
+
+const carregarListaDespesasTipo = async (tipoId) => {
+    listaDespesas.value = [];
+
+    return await axios.post(`${import.meta.env.VITE_API_URL}/despesa/listar-tipo/${despesaStore.showPerfilId}`, {
         "tipoId": tipoId,
-        "data_inicial": dataAtual,
-        "data_final": dataDiasAtras,
-        "pagina": pagina,
-        "itens_pagina": itensPagina
+        "data_inicial": despesaStore.showPrimeiroDiaMes,
+        "data_final": despesaStore.showUltimoDiaMes,
+        "pagina": 1,
+        "itens_pagina": 5
     }, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
     })
@@ -86,20 +116,26 @@ const carregarListaDespesasTipo = async (perfilId, dataAtual, dataDiasAtras, pag
 
             return listaDespesas
         })
-        .catch(() => {
-            alert("erro ao realizar comando")
-        })
+        .catch(() => { alert("erro ao realizar comando") })
 }
 
+const calcPercentualTipo = (despesa) => {
+    const resultado = (despesa.total_despesa / perfil.value.salario) * 100;
+
+    return resultado.toFixed(2)
+}
+
+const calcGastoIdeal = (despesa) => {
+    const valorPercentual = tiposDespesa.value[despesa.tipoDespesa].percentual_salario;
+    const resultado = (valorPercentual / 100) * perfil.value.salario;
+
+    return resultado.toFixed(2)
+}
 
 const calcTotalGasto = () => {
     let totalGasto = 0;
 
-    accordionDespesas.value.forEach(despesa => {
-        const valor = parseFloat(despesa.total_despesa);
-
-        totalGasto += valor
-    })
+    accordionDespesas.value.map(despesa => totalGasto += parseFloat(despesa.total_despesa))
 
     return totalGasto.toFixed(2)
 }
@@ -109,7 +145,6 @@ const getLargura = ref(window.innerWidth >= 768)
 const handleResize = () => {
     getLargura.value = window.innerWidth >= 768;
 };
-
 
 onMounted(() => {
     window.addEventListener('resize', handleResize);
