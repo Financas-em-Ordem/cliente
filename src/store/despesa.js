@@ -16,7 +16,7 @@ export const usedespesaStore = defineStore("home", {
         mes_atual: '',
         editandoDespesa: false
     }),
-    actions: {
+    actions: {  
         async getPerfil() {
             await axios.get(`${import.meta.env.VITE_API_URL}/usuario/me`, {
                 headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }

@@ -61,12 +61,12 @@ const cadastroForm = ref(null)
 
 const emailRules = [
     { required: true, message: "Por favor digite o email", trigger: "blur" },
-    /*{
+    {
         type: "email",
         message: "Por favor digite um email válido",
         trigger: "blur",
     },
-    */
+    
 ];
 
 const nomeRules = { required: true, message: "Por favor digite seu nome", trigger: "blur" };
@@ -85,7 +85,7 @@ const dataDeNascimentoRules = { required: true, message: "Por favor preencha a d
 
 const senhaRules = [
     { required: true, message: "Por favor digite a senha", trigger: "blur" },
-    /*{
+    {
         validator: (rule, value, callback) => {
             const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&]).{6,}$/;
             if (!regex.test(value)) {
@@ -99,7 +99,7 @@ const senhaRules = [
             }
         },
         trigger: "blur",
-    },*/
+    },
 ];
 
 const cpfRules = [
@@ -162,7 +162,7 @@ const cadastrar = (formCadastro) => {
                     router.push("/login")
                 })
                 .catch(error => {
-                    alert("cadastro deu erro. tente novamente");
+                    alert(error.response.data.error);
                 })
         }
     })

@@ -107,7 +107,6 @@ const excluirDespesa = async (id) => {
         })
         .catch(error => {
             alert("deu ruim")
-            console.log(error.data)
         })
 }
 
