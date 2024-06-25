@@ -1,6 +1,9 @@
+<style scoped>
+
+</style>
 <template>
 
-    <el-dialog v-model="props.openModal" title="Edite a despesa" @close="fecharForm(despesaForm)" width="500" draggable>
+    <el-dialog v-model="props.openModal" title="Edite a despesa" v-if="getLargura" @close="fecharForm(despesaForm)" width="500" draggable>
         <el-form :model="despesaEdit" ref="despesaForm">
             <el-form-item prop="descricao" :rules="descricaoRules">
                 <label for="descricao">Descrição</label>
@@ -35,13 +38,48 @@
                 <el-button type="primary" @click="salvar(despesaForm)">Salvar Despesa</el-button>
             </div>
         </template>
-        {{ despesa }}
-        {{ despesaEdit }}
+    </el-dialog>
+
+    <el-dialog v-model="props.openModal" title="Edite a despesa" v-else @close="fecharForm(despesaForm)" width="300" draggable>
+        <el-form :model="despesaEdit" ref="despesaForm">
+            <el-form-item prop="descricao" :rules="descricaoRules">
+                <label for="descricao">Descrição</label>
+                <el-input type="text" v-model="despesaEdit.descricao" />
+            </el-form-item>
+
+            <el-form-item prop="data" :rules="dataRules" style="display: grid;">
+                <label for="data">Data</label>
+                <el-date-picker class="data" v-model="despesaEdit.data" type="date" format="DD/MM/YYYY"
+                    value-format="DD/MM/YYYY" style="width: 100%;">
+                </el-date-picker>
+            </el-form-item>
+
+            <el-form-item prop="valor" :rules="valorRules">
+                <label for="valor">Valor</label>
+                <el-input type="number" v-model="despesaEdit.valor" />
+                <Money3Component v-model="despesaEdit.valor" v-bind="money" style="display: none;">
+                </Money3Component>
+            </el-form-item>
+
+
+            <el-form-item prop="tipo_despesa" style="display: grid;">
+                <label for="tipo_despesa">Tipo Despeas</label>
+                <el-select v-model="despesaEdit.tipoDespesa.id" :label="despesaEdit.tipoDespesa.nome"
+                    style="width: 100%;">
+                    <el-option v-for="tipo in despesaStore.tipos_despesas" :label="tipo.nome" :value="tipo.id" />
+                </el-select>
+            </el-form-item>
+        </el-form>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button type="primary" @click="salvar(despesaForm)">Salvar Despesa</el-button>
+            </div>
+        </template>
     </el-dialog>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted,  onBeforeUnmount } from 'vue';
 import { usedespesaStore } from '../store/despesa';
 
 import axios from 'axios';
@@ -56,6 +94,22 @@ const props = defineProps({
 const emit = defineEmits("fechaModal")
 
 const despesaStore = usedespesaStore();
+
+onMounted(async () => {
+    window.addEventListener('resize', handleResize);
+
+    await despesaStore.getTiposDespesa();
+})
+
+const getLargura = ref(window.innerWidth >= 576)
+
+const handleResize = () => {
+    getLargura.value = window.innerWidth >= 576;
+};
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', handleResize);
+});
 
 const fecharForm = (form) => {
     emit("fechaModal", false)
@@ -111,9 +165,4 @@ const salvar = (form) => {
         console.log("nao pode salvar")
     })
 }
-
-
-onMounted(async () => {
-    await despesaStore.getTiposDespesa()
-})
 </script>

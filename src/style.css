@@ -14,16 +14,47 @@
   --branco: white;
   --preto: #232323
 }
-h1{
+
+h1 {
   margin: unset;
 }
-*{
+
+* {
   color: var(--preto);
   border-color: var(--preto);
 }
+
 body {
   margin: 0;
   min-height: 100vh;
   background-color: var(--branco);
 }
+.el-checkbox-button__inner, .el-checkbox-button:first-child .el-checkbox-button__inner, .el-checkbox-button:last-child .el-checkbox-button__inner{
+  border-left-color: unset !important;
+  border-bottom-right-radius: unset !important;
+  border: 1px solid #dcdfe6 !important;
+  border-radius: 4px !important;
+}
+@media(max-width: 768px) {
+  .el-picker__popper{inset: 136px auto auto calc(50% - 175px)!important;}
+  .el-picker-panel__body {
+    display: grid;
+    min-width: unset!important;
+  }
 
+  .el-date-range-picker {
+    width: 350px!important;
+  }
+  .el-date-range-picker__content{
+    width: 100%!important;
+    padding: 4px!important;
+  }
+  .el-date-table td{width: 20px!important;}
+}
+
+@media(max-width: 425px){
+  .el-picker__popper{inset: 136px auto auto calc(50% - 136px)!important}
+  .el-date-range-picker {
+    width: 272px!important;
+  }
+}

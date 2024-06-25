@@ -2,7 +2,6 @@
     <Header />
     <ListaDespesas @isEditando="handleEdicao" @despesa="handleDespesa"></ListaDespesas>
     <FormEdicao :openModal="isEditando" :despesa="despesaAtual" :despesaEdit="despesaEdit" @fechaModal="handleEdicao" />
-    {{ isEditando }}
 </template>
 <script setup>
 import { ref } from 'vue'
