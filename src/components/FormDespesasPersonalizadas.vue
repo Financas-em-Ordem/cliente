@@ -8,6 +8,28 @@
 .container {
     padding: 24px 0;
 }
+
+
+
+@media(max-width: 425px) {
+
+    .el-checkbox-group {
+        gap: 12px;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    /* .el-checkbox-button:first-child .el-checkbox-button__inner{border: none !important;} */
+    .el-checkbox-button span,
+    .el-checkbox-button__inner {
+        border: none !important;
+        border-left-color: unset !important
+    }
+
+    .el-checkbox-button {
+        border-left-color: unset !important
+    }
+}
 </style>
 <template>
     <el-row justify='center' class="container">
@@ -19,8 +41,8 @@
                 <el-form-item prop="datas" :rules="dataRules" style="display: grid;">
                     <label for="datas">Periodo das despesas</label>
                     <el-date-picker v-model="formulario.datas" type="daterange" start-placeholder="Data inicial"
-                        end-placeholder="Data Final" format="DD/MM/YYYY" value-format="YYYY-MM-DD"
-                        style="width: 100%;" />
+                        end-placeholder="Data Final" format="DD/MM/YYYY" value-format="YYYY-MM-DD" style="width: 100%;"
+                        class="teste" />
                 </el-form-item>
 
                 <el-form-item prop="itens_paginacao" :rules="itensPagicanaoRules" style="display: grid;">
@@ -36,7 +58,7 @@
                     <label for="tipo-despesa">Periodo</label>
                     <el-checkbox-group v-model="formulario.checkbox" size="default" style="width: 100%;">
                         <el-checkbox-button v-for="tipo in despesaStore.tipos_despesas" :key="tipo.id" :label="tipo"
-                            :model-value="tipo.id">{{ tipo.nome }}</el-checkbox-button>
+                            :model-value="tipo.id" style="border: none!important">{{ tipo.nome }}</el-checkbox-button>
                     </el-checkbox-group>
                 </el-form-item>
 
