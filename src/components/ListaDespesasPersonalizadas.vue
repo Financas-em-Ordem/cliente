@@ -53,7 +53,7 @@ p {
             <div class="box-paginacao" v-show="despesas.length >= 1">
                 <span @click="voltarPagina()" v-if="pagina > 1" style="cursor: pointer;">Voltar</span>
                 <span v-else></span>
-                {{ pagina }}
+                {{ pagina == 1 && proxPagina == false ?  "" : pagina}}
                 <span @click="passarPagina()" v-if="proxPagina" style="cursor: pointer;">Passar</span>
                 <span v-else></span>
 
@@ -70,20 +70,18 @@ const props = defineProps({
     pagina: Number,
 });
 
-let indexPagina = ref(1);
+
 
 const emit = defineEmits("pagina")
 
 const voltarPagina = () => {
-    if (indexPagina.value <= 1) return
+    if (props.pagina <= 1) return
 
-    indexPagina.value--;
-    return emit("pagina", indexPagina.value);
+    return emit("pagina", 'voltar');
 }
 
 const passarPagina = () => {
-    indexPagina.value++
-    return emit("pagina", indexPagina.value)
+    return emit("pagina", 'passar')
 }
 
 const getLargura = ref(window.innerWidth >= 768)

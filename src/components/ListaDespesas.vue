@@ -1,15 +1,19 @@
 <template>
     <el-row justify="center" class="container">
-        <el-col :span="22">
+        <el-col :span="20">
             <h1>Suas despesas no mês de {{ despesaStore.showMesAtual }} </h1>
             <el-table :data="despesas" row-key="id" border default-expand-all v-if="getLargura">
-                <el-table-column prop="data" label="Data" align="center" sortable />
-                <el-table-column prop="descricao" label="Descriçao" class="coluna-descricao" align="center" sortable />
-                <el-table-column prop="tipoDespesa.nome" label="Tipo" class="coluna-descricao" align="center"
+                <el-table-column prop="data" label="Data" align="center" :width="100" sortable />
+                <el-table-column prop="descricao" label="Descriçao" class="coluna-descricao" align="center" sortable
+                    style="">
+
+                </el-table-column>
+                <el-table-column prop="tipoDespesa.nome" label="Tipo" class="coluna-descricao"
+                    :width="larguraValue <= 1200 ? 112 : ''" align="center" sortable />
+                <el-table-column prop="valor" label="Valor(R$)" :width="larguraValue <= 1200 ? 112 : ''" align="center"
                     sortable />
-                <el-table-column prop="valor" label="Valor(R$)" align="center" sortable />
-                <el-table-column prop="percentual" label="Percentual(%)" align="center" sortable />
-                <el-table-column align="center" label="Ações">
+                <el-table-column prop="percentual" label="%" :width="68" align="center" sortable />
+                <el-table-column align="center" label="Ações" :width="larguraValue <= 992 ? 100 : 150">
                     <template #default="scope">
                         <div class="despesa-buttons">
                             <el-button size="small" @click="handleOpenEdicao(scope.row)">Editar</el-button>
@@ -34,20 +38,20 @@
                 <span v-if="pagina > 1" @click="voltarPagina()" style="cursor: pointer;">Voltar</span>
                 <span v-else></span>
 
-                {{ pagina }}
-                <span v-if="proxPagina" @click="passarPagina()"  style="cursor: pointer;" >Avançar</span>
+                {{ pagina == 1 && proxPagina == false ? "" : pagina }}
+                <span v-if="proxPagina" @click="passarPagina()" style="cursor: pointer;">Avançar</span>
                 <span v-else></span>
 
-            </div>           
+            </div>
         </el-col>
 
     </el-row>
 </template>
 <script setup>
 import axios from 'axios';
-import { add, addDays, format, lastDayOfMonth, startOfMonth, getMonth } from 'date-fns';
+import { addDays, format } from 'date-fns';
 
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { usedespesaStore } from '../store/despesa';
 
 const despesaStore = usedespesaStore();
@@ -62,6 +66,8 @@ const despesas = ref([]);
 const proxPagina = ref(false);
 
 const pagina = ref(1)
+
+
 
 const fetchDespesas = async () => {
     despesas.value = [];
@@ -110,18 +116,18 @@ const excluirDespesa = async (id) => {
         })
 }
 
-const voltarPagina  = async () =>{
-    if(pagina.value <= 1) return 
-    
-    pagina.value --;
+const voltarPagina = async () => {
+    if (pagina.value <= 1) return
+
+    pagina.value--;
 
     await fetchDespesas();
 }
 
 const passarPagina = async () => {
-    if(proxPagina.value == false) return 
+    if (proxPagina.value == false) return
 
-    pagina.value ++;
+    pagina.value++;
 
     await fetchDespesas();
 }
@@ -138,8 +144,11 @@ const handleOpenEdicao = (despesa) => {
 
 const getLargura = ref(window.innerWidth >= 768)
 
+const larguraValue = ref(window.innerWidth)
+
 const handleResize = () => {
     getLargura.value = window.innerWidth >= 768;
+    larguraValue.value = window.innerWidth
 };
 
 
@@ -170,6 +179,11 @@ p {
 h4,
 p {
     text-transform: capitalize;
+}
+
+.coluna-descricao td {
+    border: 1px solid !important;
+    display: flex;
 }
 
 .despesa-item {
@@ -204,6 +218,7 @@ p {
     display: flex;
     gap: 12px;
 }
+
 .box-paginacao {
     display: flex;
     justify-content: center;
@@ -213,6 +228,17 @@ p {
 
 .box-paginacao span {
     width: 52px;
+}
+
+@media(max-width: 992px) {
+    .cell .despesa-buttons {
+        flex-direction: column;
+    }
+
+    .cell .despesa-buttons button {
+        width: fit-content;
+        margin: auto
+    }
 }
 
 @media (max-width: 576px) {

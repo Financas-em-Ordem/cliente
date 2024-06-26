@@ -22,6 +22,7 @@ const despesas = ref([]);
 const proxPagina = ref(false)
 const indexPagina = ref(1)
 
+
 const fetchDespesas = async (form) => {
     await axios.post(`${import.meta.env.VITE_API_URL}/despesa/listagem-personalizada/${despesaStore.showPerfilId}`, {
         "data_inicial": form.datas[0],
@@ -33,6 +34,7 @@ const fetchDespesas = async (form) => {
         headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
     })
         .then((response) => {
+            console.log(response.data)
             despesas.value = response.data.despesas
             proxPagina.value = response.data.itensProxPagina
 
@@ -56,10 +58,11 @@ const showFormSeacrh = (parametro) => {
     fetchDespesas(parametroConsulta.value)
 }
 
-const showPagina = (pagina) => {
+const showPagina = (acao) => {
     despesas.value = [];
-    
-    indexPagina.value = pagina;
+
+    if(acao == 'passar') indexPagina.value++;
+    else indexPagina.value--
     parametroConsulta.value = { ...parametroConsulta.value, pagina: indexPagina }
     fetchDespesas(parametroConsulta.value)
 }
