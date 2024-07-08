@@ -85,8 +85,6 @@ const consultaForm = ref({})
 
 const emit = defineEmits("searchForm")
 
-
-
 const dataRules = { required: true, message: "Por favor preencha a data", trigger: "blur" };
 
 const tipoRules = {

@@ -111,7 +111,7 @@ const salvar = (form) => {
                     "data": format(addDays(new Date(props.despesaEdit.data), 1), 'dd/MM/yyyy'),
                     "valor": parseFloat(props.despesaEdit.valor),
                     "tipoDespesaId": props.despesaEdit.tipoDespesa.id,
-                    "usuarioId": despesaStore.showPerfilId
+                    "usuarioId": despesaStore.showPerfil.id
                 }, {
                     headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
                 })

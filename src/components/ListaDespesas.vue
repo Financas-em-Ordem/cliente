@@ -67,53 +67,37 @@ const proxPagina = ref(false);
 
 const pagina = ref(1)
 
-
-
 const fetchDespesas = async () => {
     despesas.value = [];
 
-    await axios.post(`${import.meta.env.VITE_API_URL}/despesa/listar-periodo/${despesaStore.showPerfilId}`, {
-        "data_inicial": despesaStore.showPrimeiroDiaMes,
-        "data_final": despesaStore.showUltimoDiaMes,
-        "pagina": pagina.value,
-        "itens_pagina": 5
-    }, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
-    })
+    await axios
+        .get(`${import.meta.env.VITE_API_URL}/despesa/listar-mes-atual/${pagina.value}`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
+        })
         .then(response => {
-
             despesas.value = response.data.despesas
             proxPagina.value = response.data.itensProxPagina
 
             despesas.value.map(despesa => {
-                const data = format(addDays(new Date(despesa.data), 1), 'dd/MM/yyyy');
-
-                const calcPercentual = (despesa.valor / despesaStore.showPerfil.salario) * 100;
-                const percentual = calcPercentual.toFixed(2);
-
-                despesa.data = data;
-                despesa.percentual = percentual;
+                despesa.data = format(addDays(new Date(despesa.data), 1), 'dd/MM/yyyy');
+                despesa.percentual = ((despesa.valor / despesaStore.showPerfil.salario) * 100).toFixed(2);
 
                 return despesa
             })
 
         })
-        .catch(error => {
-            alert("erro ao carregar despesas")
-        })
+        .catch(error => alert("erro ao carregar despesas"))
 }
 const excluirDespesa = async (id) => {
     await axios
         .delete(`${import.meta.env.VITE_API_URL}/despesa/deletar/${id}`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
         })
-        .then(response => {
+        .then(() => {
             alert("despesa excluida")
             window.location.reload()
         })
-        .catch(error => {
-            alert("deu ruim")
-        })
+        .catch(() => alert("deu ruim"))
 }
 
 const voltarPagina = async () => {
