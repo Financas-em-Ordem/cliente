@@ -37,7 +37,7 @@ onMounted(async () => {
 
 const fetchDespesas = async () => {
     await axios
-        .get(`${import.meta.env.VITE_API_URL}/despesa/listar-dez-ultimas/${despesaStore.showPerfilId}`, {
+        .get(`${import.meta.env.VITE_API_URL}/despesa/listar-dez-ultimas`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
         })
         .then(response => {

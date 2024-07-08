@@ -32,24 +32,21 @@ const emailRules = [
         type: "email",
         message: "Por favor digite um email válido",
         trigger: "blur",
-    },
-    
+    }
 ];
 
 const passwordRules = [
     { required: true, message: "Por favor digite a senha", trigger: "blur" },
-
 ];
 
 const login = (formLogin) => {
     formLogin.validate(async (valid) => {
         if (valid) {
             await axios
-                .post(`${ import.meta.env.VITE_API_URL}/login`,{
+                .post(`${import.meta.env.VITE_API_URL}/login`, {
                     "email": form.value.email,
-                    "senha": form.value.senha
-                }
-                )
+                    "password": form.value.senha
+                })
                 .then(response => {
                     alert("logado com sucesso")
 
@@ -58,7 +55,6 @@ const login = (formLogin) => {
                 })
                 .catch(error => {
                     alert("erro ao logar")
-
                 })
         }
     })

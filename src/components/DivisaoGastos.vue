@@ -12,7 +12,8 @@
                     @click="async () => { await carregarListaDespesasTipo(despesa.tipoDespesa) }">
                     <template #title>
                         {{ despesa.nome }} (%{{ calcPercentualTipo(despesa) }} -
-                        %{{ tiposDespesa[despesa.tipoDespesa].percentual_salario }})
+
+                        %{{ percentualDespesa(despesa) }})
                         <el-icon class="header-icon">
                             <info-filled />
                         </el-icon>
@@ -69,10 +70,7 @@ onMounted(async () => {
 
 const fetchAccordion = async () => {
     return await axios
-        .post(`${import.meta.env.VITE_API_URL}/despesa/despesas-tipo/${despesaStore.showPerfilId}`, {
-            "data_inicial": despesaStore.showPrimeiroDiaMes,
-            "data_final": despesaStore.showUltimoDiaMes,
-        }, {
+        .get(`${import.meta.env.VITE_API_URL}/despesa/despesas-tipo`, {
             headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
         })
         .then(response => {
@@ -87,8 +85,6 @@ const fetchAccordion = async () => {
             })
         })
         .catch(erro => {
-            alert(JSON.stringify(erro.data))
-
             alert("erro ao realizar comando")
         })
 }
@@ -96,17 +92,12 @@ const fetchAccordion = async () => {
 const carregarListaDespesasTipo = async (tipoId) => {
     listaDespesas.value = [];
 
-    return await axios.post(`${import.meta.env.VITE_API_URL}/despesa/listar-tipo/${despesaStore.showPerfilId}`, {
-        "tipoId": tipoId,
-        "data_inicial": despesaStore.showPrimeiroDiaMes,
-        "data_final": despesaStore.showUltimoDiaMes,
-        "pagina": 1,
-        "itens_pagina": 5
-    }, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
-    })
+    return await axios
+        .get(`${import.meta.env.VITE_API_URL}/despesa/listar-tipo/${tipoId}`, {
+            headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
+        })
         .then(response => {
-            listaDespesas.value = response.data.despesas;
+            listaDespesas.value = response.data;
 
             listaDespesas.value.map(despesa => {
                 despesa.data = format(despesa.data, "dd/MM/yyyy");
@@ -119,6 +110,12 @@ const carregarListaDespesasTipo = async (tipoId) => {
         .catch(() => { alert("erro ao realizar comando") })
 }
 
+const percentualDespesa = (despesa) => {
+    const { percentual_salario } = tiposDespesa.value.find(element => element.id == despesa.tipoDespesa)
+
+    return percentual_salario;
+}
+
 const calcPercentualTipo = (despesa) => {
     const resultado = (despesa.total_despesa / perfil.value.salario) * 100;
 
@@ -126,10 +123,7 @@ const calcPercentualTipo = (despesa) => {
 }
 
 const calcGastoIdeal = (despesa) => {
-    const valorPercentual = tiposDespesa.value[despesa.tipoDespesa].percentual_salario;
-    const resultado = (valorPercentual / 100) * perfil.value.salario;
-
-    return resultado.toFixed(2)
+    return (percentualDespesa(despesa) / 100) * perfil.value.salario;
 }
 
 const calcTotalGasto = () => {
